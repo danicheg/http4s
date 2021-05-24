@@ -19,43 +19,55 @@ package client
 
 import cats.effect._
 import cats.syntax.all._
+import com.sun.net.httpserver._
 import fs2._
 import fs2.io._
+import java.io.PrintWriter
+import java.util.Arrays
 import java.util.Locale
-import javax.servlet.http.{HttpServlet, HttpServletRequest, HttpServletResponse}
-import org.http4s.client.testroutes.GetRoutes
 import org.http4s.client.dsl.Http4sClientDsl
+import org.http4s.client.testroutes.GetRoutes
 import org.http4s.dsl.io._
 import org.http4s.multipart.{Multipart, Part}
 import scala.concurrent.duration._
-import java.util.Arrays
 
 abstract class ClientRouteTestBattery(name: String) extends Http4sSuite with Http4sClientDsl[IO] {
   val timeout = 20.seconds
 
   def clientResource: Resource[IO, Client[IO]]
 
-  def testServlet =
-    new HttpServlet {
-      override def doGet(req: HttpServletRequest, srv: HttpServletResponse): Unit =
-        GetRoutes.getPaths.get(req.getRequestURI) match {
-          case Some(r) => renderResponse(srv, r).unsafeRunSync() // We are outside the IO world
-          case None => srv.sendError(404)
+  val testHandler: HttpHandler = exchange => {
+    val io = exchange.getRequestMethod match {
+      case "GET" =>
+        val path = exchange.getRequestURI.getPath
+        GetRoutes.getPaths.get(path) match {
+          case Some(r) =>
+            renderResponse(exchange, r)
+          case None =>
+            IO {
+              exchange.sendResponseHeaders(404, -1L)
+              exchange.close()
+            }
         }
-
-      override def doPost(req: HttpServletRequest, srv: HttpServletResponse): Unit = {
-        srv.setStatus(200)
-        val s = scala.io.Source.fromInputStream(req.getInputStream).mkString
-        srv.getWriter.print(s)
-        srv.getWriter.flush()
-      }
+      case "POST" =>
+        IO {
+          exchange.sendResponseHeaders(200, 0L)
+          val s = scala.io.Source.fromInputStream(exchange.getRequestBody).mkString
+          val out = new PrintWriter(exchange.getResponseBody())
+          out.print(s)
+          out.flush()
+          exchange.close()
+        }
     }
+    Http4sSuite.TestBlocker.blockOn(io).start.unsafeRunSync()
+    ()
+  }
 
   // Need to override the context shift from munitCatsEffect
   // This is only required for JettyClient
   implicit val contextShift: ContextShift[IO] = Http4sSuite.TestContextShift
 
-  val jetty = resourceSuiteFixture("server", JettyScaffold[IO](1, false, testServlet))
+  val jetty = resourceSuiteFixture("server", ServerScaffold[IO](1, false, testHandler))
   val client = resourceSuiteFixture("client", clientResource)
 
   test(s"$name Repeat a simple request") {
@@ -138,15 +150,20 @@ abstract class ClientRouteTestBattery(name: String) extends Http4sSuite with Htt
     } yield true
   }
 
-  private def renderResponse(srv: HttpServletResponse, resp: Response[IO]): IO[Unit] = {
-    srv.setStatus(resp.status.code)
+  private def renderResponse(exchange: HttpExchange, resp: Response[IO]): IO[Unit] = {
     resp.headers.foreach { h =>
-      srv.addHeader(h.name.toString, h.value)
+      if (h.name =!= headers.`Content-Length`.name)
+        exchange.getResponseHeaders.add(h.name.toString, h.value)
     }
+    exchange.sendResponseHeaders(resp.status.code, resp.contentLength.getOrElse(0L))
     resp.body
       .through(
-        writeOutputStream[IO](IO.pure(srv.getOutputStream), testBlocker, closeAfterUse = false))
+        writeOutputStream[IO](
+          IO.pure(exchange.getResponseBody),
+          testBlocker,
+          closeAfterUse = false))
       .compile
       .drain
+      .guarantee(IO(exchange.close()))
   }
 }

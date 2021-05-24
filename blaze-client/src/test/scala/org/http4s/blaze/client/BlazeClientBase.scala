@@ -18,12 +18,12 @@ package org.http4s.blaze
 package client
 
 import cats.effect._
+import cats.syntax.all._
+import com.sun.net.httpserver.HttpHandler
 import javax.net.ssl.SSLContext
-import javax.servlet.ServletOutputStream
-import javax.servlet.http.{HttpServlet, HttpServletRequest, HttpServletResponse}
 import org.http4s._
 import org.http4s.blaze.util.TickWheelExecutor
-import org.http4s.client.JettyScaffold
+import org.http4s.client.ServerScaffold
 import org.http4s.client.testroutes.GetRoutes
 import scala.concurrent.duration._
 
@@ -55,36 +55,45 @@ trait BlazeClientBase extends Http4sSuite {
     builderWithMaybeSSLContext.resource
   }
 
-  private def testServlet =
-    new HttpServlet {
-      override def doGet(req: HttpServletRequest, srv: HttpServletResponse): Unit =
-        GetRoutes.getPaths.get(req.getRequestURI) match {
+  private def testHandler: HttpHandler = exchange => {
+    val io = exchange.getRequestMethod match {
+      case "GET" =>
+        val path = exchange.getRequestURI.getPath
+        GetRoutes.getPaths.get(path) match {
           case Some(resp) =>
-            srv.setStatus(resp.status.code)
-            resp.headers.foreach { h =>
-              srv.addHeader(h.name.toString, h.value)
-            }
-
-            val os: ServletOutputStream = srv.getOutputStream
-
-            val writeBody: IO[Unit] = resp.body
-              .evalMap { byte =>
-                IO(os.write(Array(byte)))
+            val prelude = IO {
+              resp.headers.foreach { h =>
+                if (h.name =!= headers.`Content-Length`.name)
+                  exchange.getResponseHeaders.add(h.name.toString, h.value)
               }
-              .compile
-              .drain
-            val flushOutputStream: IO[Unit] = IO(os.flush())
-            (writeBody *> flushOutputStream).unsafeRunSync()
-
-          case None => srv.sendError(404)
+              exchange.sendResponseHeaders(resp.status.code, resp.contentLength.getOrElse(0L))
+            }
+            val body =
+              resp.body
+                .evalMap { byte =>
+                  IO(exchange.getResponseBody.write(Array(byte)))
+                }
+                .compile
+                .drain
+            val flush = IO(exchange.getResponseBody.flush())
+            val close = IO(exchange.close())
+            (prelude *> body *> flush).guarantee(close)
+          case None =>
+            IO {
+              exchange.sendResponseHeaders(404, -1)
+              exchange.close()
+            }
         }
-
-      override def doPost(req: HttpServletRequest, resp: HttpServletResponse): Unit = {
-        resp.setStatus(Status.Ok.code)
-        req.getInputStream.close()
-      }
+      case "POST" =>
+        IO {
+          exchange.sendResponseHeaders(204, -1)
+          exchange.close()
+        }
     }
+    Http4sSuite.TestBlocker.blockOn(io).start.unsafeRunSync()
+    ()
+  }
 
-  val jettyServer = resourceSuiteFixture("http", JettyScaffold[IO](2, false, testServlet))
-  val jettySslServer = resourceSuiteFixture("https", JettyScaffold[IO](1, true, testServlet))
+  val server = resourceSuiteFixture("http", ServerScaffold[IO](2, false, testHandler))
+  val secureServer = resourceSuiteFixture("https", ServerScaffold[IO](1, true, testHandler))
 }
