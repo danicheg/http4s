@@ -18,29 +18,26 @@ package org.http4s
 package blazecore
 package util
 
-import cats.effect.kernel.Outcome
 import cats.syntax.all._
 import org.http4s.util.StringWriter
 import org.log4s.getLogger
-import cats.effect.syntax.monadCancel._
 
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 import scala.concurrent._
-import scala.language.higherKinds
 
 private[http4s] trait Http1Writer[F[_]] extends EntityBodyWriter[F] {
   final def write(headerWriter: StringWriter, body: EntityBody[F]): F[Boolean] =
-    fromFutureNoShift(F.delay(writeHeaders(headerWriter)))
-      .guaranteeCase {
-        case Outcome.Succeeded(_) =>
-          F.unit
-
-        case Outcome.Errored(_) | Outcome.Canceled() =>
-          body.drain.compile.drain.handleError { t2 =>
-            Http1Writer.logger.error(t2)("Error draining body")
-          }
-      } >> writeEntityBody(body)
+    fromFutureNoShift(F.delay(writeHeaders(headerWriter))).attempt.flatMap {
+      case Right(()) =>
+        writeEntityBody(body)
+      case Left(t) =>
+        body.drain.compile.drain.handleError { t2 =>
+          // Don't lose this error when sending the other
+          // TODO implement with cats.effect.Bracket when we have it
+          Http1Writer.logger.error(t2)("Error draining body")
+        } *> F.raiseError(t)
+    }
 
   /* Writes the header.  It is up to the writer whether to flush immediately or to
    * buffer the header with a subsequent chunk. */
