@@ -18,7 +18,6 @@ package org.http4s
 
 import cats.Contravariant
 import cats.Show
-import cats.data.NonEmptyList
 import cats.effect.Sync
 import cats.syntax.all._
 import fs2.Chunk
@@ -128,12 +127,7 @@ object EntityEncoder {
         Entity(a.flatMap(W.toEntity(_).body))
 
       override def headers: Headers =
-        W.headers.get[`Transfer-Encoding`] match {
-          case Some(transferCoding) if transferCoding.hasChunked =>
-            W.headers
-          case _ =>
-            W.headers.add(`Transfer-Encoding`(TransferCoding.chunked.pure[NonEmptyList]))
-        }
+        Headers.empty
     }
 
   implicit val unitEncoder: EntityEncoder.Pure[Unit] =
@@ -158,18 +152,16 @@ object EntityEncoder {
   implicit def byteVectorEncoder[F[_]]: EntityEncoder[F, ByteVector] =
     chunkEncoder.contramap(Chunk.byteVector)
 
-  /** Encodes an entity body.  Chunking of the stream is preserved.  A
-    * `Transfer-Encoding: chunked` header is set, as we cannot know
-    * the content length without running the stream.
+  /** Encodes an entity body. Chunking of the stream is preserved.
     */
   implicit def entityBodyEncoder[F[_]]: EntityEncoder[F, EntityBody[F]] =
-    encodeBy(`Transfer-Encoding`(TransferCoding.chunked.pure[NonEmptyList])) { body =>
-      Entity(body, None)
+    encodeBy() { body =>
+      Entity(body)
     }
 
   // TODO if Header moves to Entity, can add a Content-Disposition with the filename
   implicit def pathEncoder[F[_]: Files]: EntityEncoder[F, fs2.io.file.Path] =
-    encodeBy[F, fs2.io.file.Path](`Transfer-Encoding`(TransferCoding.chunked)) { p =>
+    encodeBy[F, fs2.io.file.Path]() { p =>
       Entity(Files[F].readAll(p))
     }
 
@@ -227,7 +219,7 @@ object EntityEncoder {
     }
 
   implicit def serverSentEventEncoder[F[_]]: EntityEncoder[F, EventStream[F]] =
-    entityBodyEncoder[F]
-      .contramap[EventStream[F]](_.through(ServerSentEvent.encoder))
-      .withContentType(`Content-Type`(MediaType.`text/event-stream`))
+    EntityEncoder.encodeBy(`Content-Type`(MediaType.`text/event-stream`)) { e: EventStream[F] =>
+      Entity[F](e.through(ServerSentEvent.encoder))
+    }
 }
