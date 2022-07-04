@@ -147,21 +147,19 @@ class UriParserSuite extends Http4sSuite {
     assertEquals(u, Right(Uri(path = path"/foo/bar", query = Query("" -> None))))
   }
 
-  {
-    val q = Query.unsafeFromString("param1=3&param2=2&param2=foo")
-    val u = Uri(query = q)
-    test("Uri.requestTarget should represent query as multiParams as a Map[String,Seq[String]]") {
-      assertEquals(
-        u.multiParams,
-        Map("param1" -> immutable.Seq("3"), "param2" -> immutable.Seq("2", "foo")),
-      )
-    }
+  private val q = Query.unsafeFromString("param1=3&param2=2&param2=foo")
+  private val u = Uri(query = q)
+  test("Uri.requestTarget should represent query as multiParams as a Map[String,Seq[String]]") {
+    assertEquals(
+      u.multiParams,
+      Map("param1" -> immutable.Seq("3"), "param2" -> immutable.Seq("2", "foo")),
+    )
+  }
 
-    test(
-      "Uri.requestTarget should parse query and represent params as a Map[String,String] taking the first param"
-    ) {
-      assertEquals(u.params, Map("param1" -> "3", "param2" -> "2"))
-    }
+  test(
+    "Uri.requestTarget should parse query and represent params as a Map[String,String] taking the first param"
+  ) {
+    assertEquals(u.params, Map("param1" -> "3", "param2" -> "2"))
   }
 
   test("Uri.requestTarget should fail on invalid uri") {
