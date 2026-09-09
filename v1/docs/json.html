@@ -165,9 +165,9 @@
     <li class="level2 nav-leaf"><a href="testing.html">Testing</a></li>
     <li class="level2 nav-leaf"><a href="uri.html">URI Handling</a></li>
     <li class="level2 nav-leaf"><a href="deployment.html">Deployment</a></li>
-    <li class="level2 nav-leaf"><a href="error-handling.html">Error Handling</a></li>
     <li class="level2 nav-leaf"><a href="multipart.html">Multipart and Form Handling</a></li>
     <li class="level2 nav-leaf"><a href="methods.html">HTTP Methods</a></li>
+    <li class="level2 nav-leaf"><a href="error-handling.html">Error Handling</a></li>
     <li class="level1 nav-header">Related Projects</li>
     <li class="level2 nav-leaf"><a href="https://github.com/http4s/blaze">blaze</a></li>
     <li class="level2 nav-leaf"><a href="https://github.com/http4s/http4s-armeria">http4s-armeria</a></li>
@@ -231,9 +231,9 @@
 </span><span class="identifier">libraryDependencies</span><span> ++= </span><span class="type-name">Seq</span><span>(
   </span><span class="string-literal">&quot;org.http4s&quot;</span><span> %% </span><span class="string-literal">&quot;http4s-circe&quot;</span><span> % </span><span class="identifier">http4sVersion</span><span>,
   </span><span class="comment">// Optional for auto-derivation of JSON codecs
-</span><span>  </span><span class="string-literal">&quot;io.circe&quot;</span><span> %% </span><span class="string-literal">&quot;circe-generic&quot;</span><span> % </span><span class="string-literal">&quot;0.14.8&quot;</span><span>,
+</span><span>  </span><span class="string-literal">&quot;io.circe&quot;</span><span> %% </span><span class="string-literal">&quot;circe-generic&quot;</span><span> % </span><span class="string-literal">&quot;0.14.16&quot;</span><span>,
   </span><span class="comment">// Optional for string interpolation to JSON model
-</span><span>  </span><span class="string-literal">&quot;io.circe&quot;</span><span> %% </span><span class="string-literal">&quot;circe-literal&quot;</span><span> % </span><span class="string-literal">&quot;0.14.8&quot;</span><span>,
+</span><span>  </span><span class="string-literal">&quot;io.circe&quot;</span><span> %% </span><span class="string-literal">&quot;circe-literal&quot;</span><span> % </span><span class="string-literal">&quot;0.14.16&quot;</span><span>,
   </span><span class="string-literal">&quot;org.typelevel&quot;</span><span> %% </span><span class="string-literal">&quot;log4cats-slf4j&quot;</span><span> % </span><span class="identifier">log4catsVersion</span><span>,
 )
 
@@ -272,19 +272,19 @@
         <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">org</span><span>.</span><span class="identifier">http4s</span><span>.</span><span class="identifier">circe</span><span>.</span><span class="identifier">_</span></code></pre>
         <pre><code class="nohighlight"><span class="type-name">Ok</span><span>(</span><span class="identifier">greeting</span><span>).</span><span class="identifier">unsafeRunSync</span><span>()
 </span><span class="comment">// res1: Response[IO] = (
-//    = Status(code = 200),
-//    = HttpVersion(major = 1, minor = 1),
-//    = Headers(Content-Type: application/json, Content-Length: 17),
-//    = Strict(
+//   `` = Status(code = 200),
+//   `` = HttpVersion(major = 1, minor = 1),
+//   `` = Headers(Content-Type: application/json, Content-Length: 17),
+//   `` = Strict(
 //     bytes = Chunk(
 //       bytes = View(
-//         at = scodec.bits.ByteVector$AtByteBuffer@5c6cc231,
+//         at = scodec.bits.ByteVector$AtByteBuffer@4207e4ae,
 //         offset = 0L,
 //         size = 17L
 //       )
 //     )
 //   ),
-//    = org.typelevel.vault.Vault@756ee06d
+//   `` = org.typelevel.vault.Vault@2a0acec0
 // )</span></code></pre>
         <p>The same <code>EntityEncoder[Json]</code> we use on server responses is also
         useful on client requests:</p>
@@ -307,7 +307,7 @@
   </span><span class="type-name">Encoder</span><span>.</span><span class="identifier">instance</span><span> { (</span><span class="identifier">hello</span><span>: </span><span class="type-name">Hello</span><span>) =&gt;
     </span><span class="string-literal">json&quot;&quot;&quot;{&quot;hello&quot;: </span><span class="substitution">${hello.name}</span><span class="string-literal">}&quot;&quot;&quot;</span><span>
   }
-</span><span class="comment">// HelloEncoder: Encoder[Hello] = io.circe.Encoder$$anon$3@4b43d81b
+</span><span class="comment">// HelloEncoder: Encoder[Hello] = io.circe.Encoder$$anon$3@ac72f11
 </span><span>
 </span><span class="type-name">Hello</span><span>(</span><span class="string-literal">&quot;Alice&quot;</span><span>).</span><span class="identifier">asJson</span><span>
 </span><span class="comment">// res3: Json = JObject(value = object[hello -&gt; &quot;Alice&quot;])</span></code></pre>
@@ -321,43 +321,43 @@
         and responses for our case classes:</p>
         <pre><code class="nohighlight"><span class="type-name">Ok</span><span>(</span><span class="type-name">Hello</span><span>(</span><span class="string-literal">&quot;Alice&quot;</span><span>).</span><span class="identifier">asJson</span><span>).</span><span class="identifier">unsafeRunSync</span><span>()
 </span><span class="comment">// res5: Response[IO] = (
-//    = Status(code = 200),
-//    = HttpVersion(major = 1, minor = 1),
-//    = Headers(Content-Type: application/json, Content-Length: 17),
-//    = Strict(
+//   `` = Status(code = 200),
+//   `` = HttpVersion(major = 1, minor = 1),
+//   `` = Headers(Content-Type: application/json, Content-Length: 17),
+//   `` = Strict(
 //     bytes = Chunk(
 //       bytes = View(
-//         at = scodec.bits.ByteVector$AtByteBuffer@3eaa33e4,
+//         at = scodec.bits.ByteVector$AtByteBuffer@76eaf55b,
 //         offset = 0L,
 //         size = 17L
 //       )
 //     )
 //   ),
-//    = org.typelevel.vault.Vault@1677cfb0
+//   `` = org.typelevel.vault.Vault@1fcfcfd3
 // )
 </span><span class="type-name">Request</span><span>[</span><span class="type-name">IO</span><span>](</span><span class="type-name">Method</span><span>.</span><span class="type-name">POST</span><span>, </span><span class="string-literal">uri&quot;/hello&quot;</span><span>)
   .</span><span class="identifier">withEntity</span><span>(</span><span class="type-name">User</span><span>(</span><span class="string-literal">&quot;Bob&quot;</span><span>).</span><span class="identifier">asJson</span><span>)
 </span><span class="comment">// res6: Request[[x]IO[x]] = (
-//    = POST,
-//    = Uri(
+//   `` = POST,
+//   `` = Uri(
 //     scheme = None,
 //     authority = None,
 //     path = /hello,
 //     query = ,
 //     fragment = None
 //   ),
-//    = HttpVersion(major = 1, minor = 1),
-//    = Headers(Content-Length: 14, Content-Type: application/json),
-//    = Strict(
+//   `` = HttpVersion(major = 1, minor = 1),
+//   `` = Headers(Content-Length: 14, Content-Type: application/json),
+//   `` = Strict(
 //     bytes = Chunk(
 //       bytes = View(
-//         at = scodec.bits.ByteVector$AtByteBuffer@10639cda,
+//         at = scodec.bits.ByteVector$AtByteBuffer@1fc0be4c,
 //         offset = 0L,
 //         size = 14L
 //       )
 //     )
 //   ),
-//    = org.typelevel.vault.Vault@352d0d5f
+//   `` = org.typelevel.vault.Vault@b1f8ae7
 // )</span></code></pre>
         <p>If within some route we serve json only, we can use:</p>
         <pre class="keep-together pdf epub"><code class="nohighlight"><span>{
@@ -389,7 +389,7 @@
         the way from HTTP to your type <code>A</code>.  Specifically, <code>jsonOf[A]</code> takes
         an implicit <code>Decoder[A]</code> and makes a <code>EntityDecoder[A]</code>:</p>
         <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">implicit</span><span> </span><span class="keyword">val</span><span> </span><span class="identifier">userDecoder</span><span>: </span><span class="type-name">EntityDecoder</span><span>[</span><span class="type-name">IO</span><span>, </span><span class="type-name">User</span><span>] = </span><span class="identifier">jsonOf</span><span>[</span><span class="type-name">IO</span><span>, </span><span class="type-name">User</span><span>]
-</span><span class="comment">// userDecoder: EntityDecoder[IO, User] = org.http4s.EntityDecoder$$anon$2@6b5971ab
+</span><span class="comment">// userDecoder: EntityDecoder[IO, User] = org.http4s.EntityDecoder$$anon$2@241e7def
 </span><span class="type-name">Ok</span><span>(</span><span class="string-literal">&quot;&quot;&quot;{&quot;name&quot;:&quot;Alice&quot;}&quot;&quot;&quot;</span><span>).</span><span class="identifier">flatMap</span><span>(</span><span class="identifier">_</span><span>.</span><span class="identifier">as</span><span>[</span><span class="type-name">User</span><span>]).</span><span class="identifier">unsafeRunSync</span><span>()
 </span><span class="comment">// res10: User = User(name = &quot;Alice&quot;)
 </span><span>

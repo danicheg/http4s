@@ -165,9 +165,9 @@
     <li class="level2 nav-leaf"><a href="testing.html">Testing</a></li>
     <li class="level2 nav-leaf"><a href="uri.html">URI Handling</a></li>
     <li class="level2 nav-leaf"><a href="deployment.html">Deployment</a></li>
-    <li class="level2 nav-leaf"><a href="error-handling.html">Error Handling</a></li>
     <li class="level2 active nav-leaf"><a href="#">Multipart and Form Handling</a></li>
     <li class="level2 nav-leaf"><a href="methods.html">HTTP Methods</a></li>
+    <li class="level2 nav-leaf"><a href="error-handling.html">Error Handling</a></li>
     <li class="level1 nav-header">Related Projects</li>
     <li class="level2 nav-leaf"><a href="https://github.com/http4s/blaze">blaze</a></li>
     <li class="level2 nav-leaf"><a href="https://github.com/http4s/http4s-armeria">http4s-armeria</a></li>
@@ -365,10 +365,9 @@
         browser to <a href="http://localhost:8089/">http://localhost:8089/</a>. It includes a page with a form and the endpoint receiving the submission.
         To run this code create a file (it should have the <code>.scala</code> extension) with the following contents and run
         <code>scala-cli file.scala</code>.</p>
-        <pre><code class="nohighlight"><span class="comment">//&gt; using scala 2.13
-//&gt; using dep org.http4s::http4s-ember-client::1.0.0-M22
-//&gt; using dep org.http4s::http4s-ember-server::1.0.0-M22
-//&gt; using dep org.http4s::http4s-dsl::1.0.0-M22
+        <pre><code class="nohighlight"><span class="comment">//&gt; using dep &quot;org.http4s::http4s-ember-client:1.0.0-M22&quot;
+//&gt; using dep &quot;org.http4s::http4s-ember-server:1.0.0-M22&quot;
+//&gt; using dep &quot;org.http4s::http4s-dsl:1.0.0-M22&quot;
 </span><span>
 </span><span class="keyword">import</span><span> </span><span class="identifier">cats</span><span>.</span><span class="identifier">effect</span><span>.</span><span class="identifier">_</span><span>
 </span><span class="keyword">import</span><span> </span><span class="identifier">cats</span><span>.</span><span class="identifier">syntax</span><span>.</span><span class="identifier">all</span><span>.</span><span class="identifier">_</span><span>

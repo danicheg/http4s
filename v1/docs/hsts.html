@@ -165,9 +165,9 @@
     <li class="level2 nav-leaf"><a href="testing.html">Testing</a></li>
     <li class="level2 nav-leaf"><a href="uri.html">URI Handling</a></li>
     <li class="level2 nav-leaf"><a href="deployment.html">Deployment</a></li>
-    <li class="level2 nav-leaf"><a href="error-handling.html">Error Handling</a></li>
     <li class="level2 nav-leaf"><a href="multipart.html">Multipart and Form Handling</a></li>
     <li class="level2 nav-leaf"><a href="methods.html">HTTP Methods</a></li>
+    <li class="level2 nav-leaf"><a href="error-handling.html">Error Handling</a></li>
     <li class="level1 nav-header">Related Projects</li>
     <li class="level2 nav-leaf"><a href="https://github.com/http4s/blaze">blaze</a></li>
     <li class="level2 nav-leaf"><a href="https://github.com/http4s/http4s-armeria">http4s-armeria</a></li>
@@ -236,19 +236,19 @@
         <pre><code class="nohighlight"><span class="comment">// Do not call &#39;unsafeRunSync&#39; in your code
 </span><span class="keyword">val</span><span> </span><span class="identifier">responseOk</span><span> = </span><span class="identifier">service</span><span>.</span><span class="identifier">orNotFound</span><span>(</span><span class="identifier">request</span><span>).</span><span class="identifier">unsafeRunSync</span><span>()
 </span><span class="comment">// responseOk: Response[[A]IO[A]] = (
-//    = Status(code = 200),
-//    = HttpVersion(major = 1, minor = 1),
-//    = Headers(Content-Type: text/plain; charset=UTF-8, Content-Length: 2),
-//    = Strict(
+//   `` = Status(code = 200),
+//   `` = HttpVersion(major = 1, minor = 1),
+//   `` = Headers(Content-Type: text/plain; charset=UTF-8, Content-Length: 2),
+//   `` = Strict(
 //     bytes = Chunk(
 //       bytes = View(
-//         at = scodec.bits.ByteVector$AtArray@40dc4433,
+//         at = scodec.bits.ByteVector$AtArray@108a3301,
 //         offset = 0L,
 //         size = 2L
 //       )
 //     )
 //   ),
-//    = org.typelevel.vault.Vault@5dc8d833
+//   `` = org.typelevel.vault.Vault@6c252c57
 // )
 </span><span class="identifier">responseOk</span><span>.</span><span class="identifier">headers</span><span>
 </span><span class="comment">// res0: Headers = Headers(Content-Type: text/plain; charset=UTF-8, Content-Length: 2)</span></code></pre>
@@ -259,19 +259,19 @@
         <pre><code class="nohighlight"><span class="comment">// Do not call &#39;unsafeRunSync&#39; in your code
 </span><span class="keyword">val</span><span> </span><span class="identifier">responseHSTS</span><span> = </span><span class="identifier">hstsService</span><span>.</span><span class="identifier">orNotFound</span><span>(</span><span class="identifier">request</span><span>).</span><span class="identifier">unsafeRunSync</span><span>()
 </span><span class="comment">// responseHSTS: Response[[A]IO[A]] = (
-//    = Status(code = 200),
-//    = HttpVersion(major = 1, minor = 1),
-//    = Headers(Content-Type: text/plain; charset=UTF-8, Content-Length: 2, Strict-Transport-Security: max-age=31536000; includeSubDomains),
-//    = Strict(
+//   `` = Status(code = 200),
+//   `` = HttpVersion(major = 1, minor = 1),
+//   `` = Headers(Content-Type: text/plain; charset=UTF-8, Content-Length: 2, Strict-Transport-Security: max-age=31536000; includeSubDomains),
+//   `` = Strict(
 //     bytes = Chunk(
 //       bytes = View(
-//         at = scodec.bits.ByteVector$AtArray@5613cf03,
+//         at = scodec.bits.ByteVector$AtArray@7d3f8480,
 //         offset = 0L,
 //         size = 2L
 //       )
 //     )
 //   ),
-//    = org.typelevel.vault.Vault@25b24dfb
+//   `` = org.typelevel.vault.Vault@7d9645fa
 // )
 </span><span class="identifier">responseHSTS</span><span>.</span><span class="identifier">headers</span><span>
 </span><span class="comment">// res1: Headers = Headers(Content-Type: text/plain; charset=UTF-8, Content-Length: 2, Strict-Transport-Security: max-age=31536000; includeSubDomains)</span></code></pre>
@@ -293,19 +293,19 @@
         <pre><code class="nohighlight"><span class="comment">// Do not call &#39;unsafeRunSync&#39; in your code
 </span><span class="keyword">val</span><span> </span><span class="identifier">responseCustom</span><span> = </span><span class="identifier">hstsServiceCustom</span><span>.</span><span class="identifier">orNotFound</span><span>(</span><span class="identifier">request</span><span>).</span><span class="identifier">unsafeRunSync</span><span>()
 </span><span class="comment">// responseCustom: Response[[A]IO[A]] = (
-//    = Status(code = 200),
-//    = HttpVersion(major = 1, minor = 1),
-//    = Headers(Content-Type: text/plain; charset=UTF-8, Content-Length: 2, Strict-Transport-Security: max-age=2592000; includeSubDomains; preload),
-//    = Strict(
+//   `` = Status(code = 200),
+//   `` = HttpVersion(major = 1, minor = 1),
+//   `` = Headers(Content-Type: text/plain; charset=UTF-8, Content-Length: 2, Strict-Transport-Security: max-age=2592000; includeSubDomains; preload),
+//   `` = Strict(
 //     bytes = Chunk(
 //       bytes = View(
-//         at = scodec.bits.ByteVector$AtArray@184209e5,
+//         at = scodec.bits.ByteVector$AtArray@5bf3d3ae,
 //         offset = 0L,
 //         size = 2L
 //       )
 //     )
 //   ),
-//    = org.typelevel.vault.Vault@2fa85283
+//   `` = org.typelevel.vault.Vault@1405e4bf
 // )
 </span><span class="identifier">responseCustom</span><span>.</span><span class="identifier">headers</span><span>
 </span><span class="comment">// res2: Headers = Headers(Content-Type: text/plain; charset=UTF-8, Content-Length: 2, Strict-Transport-Security: max-age=2592000; includeSubDomains; preload)</span></code></pre>

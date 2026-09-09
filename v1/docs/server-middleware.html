@@ -165,9 +165,9 @@
     <li class="level2 nav-leaf"><a href="testing.html">Testing</a></li>
     <li class="level2 nav-leaf"><a href="uri.html">URI Handling</a></li>
     <li class="level2 nav-leaf"><a href="deployment.html">Deployment</a></li>
-    <li class="level2 nav-leaf"><a href="error-handling.html">Error Handling</a></li>
     <li class="level2 nav-leaf"><a href="multipart.html">Multipart and Form Handling</a></li>
     <li class="level2 nav-leaf"><a href="methods.html">HTTP Methods</a></li>
+    <li class="level2 nav-leaf"><a href="error-handling.html">Error Handling</a></li>
     <li class="level1 nav-header">Related Projects</li>
     <li class="level2 nav-leaf"><a href="https://github.com/http4s/blaze">blaze</a></li>
     <li class="level2 nav-leaf"><a href="https://github.com/http4s/http4s-armeria">http4s-armeria</a></li>
@@ -350,7 +350,7 @@
 
 </span><span class="keyword">val</span><span> </span><span class="identifier">cacheClient</span><span> = </span><span class="type-name">Client</span><span>.</span><span class="identifier">fromHttpApp</span><span>(</span><span class="identifier">cacheService</span><span>)</span></code></pre>
         <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">cacheClient</span><span>.</span><span class="identifier">run</span><span>(</span><span class="identifier">okRequest</span><span>).</span><span class="identifier">use</span><span>(</span><span class="identifier">_</span><span>.</span><span class="identifier">headers</span><span>.</span><span class="identifier">pure</span><span>[</span><span class="type-name">IO</span><span>]).</span><span class="identifier">unsafeRunSync</span><span>()
-</span><span class="comment">// res0: Headers = Headers(Content-Length: 0, Cache-Control: public, max-age=10800, Date: Sun, 12 Jan 2025 08:25:17 GMT, Expires: Sun, 12 Jan 2025 11:25:17 GMT)
+</span><span class="comment">// res0: Headers = Headers(Content-Length: 0, Cache-Control: public, max-age=10800, Date: Wed, 09 Sep 2026 11:10:40 GMT, Expires: Wed, 09 Sep 2026 14:10:40 GMT)
 </span><span class="identifier">cacheClient</span><span>.</span><span class="identifier">run</span><span>(</span><span class="identifier">badRequest</span><span>).</span><span class="identifier">use</span><span>(</span><span class="identifier">_</span><span>.</span><span class="identifier">headers</span><span>.</span><span class="identifier">pure</span><span>[</span><span class="type-name">IO</span><span>]).</span><span class="identifier">unsafeRunSync</span><span>()
 </span><span class="comment">// res1: Headers = Headers(Content-Length: 0)
 </span><span class="identifier">cacheClient</span><span>.</span><span class="identifier">run</span><span>(</span><span class="identifier">postRequest</span><span>).</span><span class="identifier">use</span><span>(</span><span class="identifier">_</span><span>.</span><span class="identifier">headers</span><span>.</span><span class="identifier">pure</span><span>[</span><span class="type-name">IO</span><span>]).</span><span class="identifier">unsafeRunSync</span><span>()
@@ -363,7 +363,7 @@
 </span><span class="keyword">val</span><span> </span><span class="identifier">dateService</span><span> = </span><span class="type-name">Date</span><span>.</span><span class="identifier">httpRoutes</span><span>(</span><span class="identifier">service</span><span>).</span><span class="identifier">orNotFound</span><span>
 </span><span class="keyword">val</span><span> </span><span class="identifier">dateClient</span><span> = </span><span class="type-name">Client</span><span>.</span><span class="identifier">fromHttpApp</span><span>(</span><span class="identifier">dateService</span><span>)</span></code></pre>
         <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">dateClient</span><span>.</span><span class="identifier">run</span><span>(</span><span class="identifier">okRequest</span><span>).</span><span class="identifier">use</span><span>(</span><span class="identifier">_</span><span>.</span><span class="identifier">headers</span><span>.</span><span class="identifier">pure</span><span>[</span><span class="type-name">IO</span><span>]).</span><span class="identifier">unsafeRunSync</span><span>()
-</span><span class="comment">// res3: Headers = Headers(Content-Length: 0, Date: Sun, 12 Jan 2025 08:25:17 GMT)</span></code></pre>
+</span><span class="comment">// res3: Headers = Headers(Content-Length: 0, Date: Wed, 09 Sep 2026 11:10:40 GMT)</span></code></pre>
         
         <h3 id="headerecho" class="section"><a class="anchor-link left" href="#headerecho"><i class="icofont-laika link">&#xef71;</i></a>HeaderEcho</h3>
         <p>Adds headers included in the request to the response.</p>
@@ -404,10 +404,10 @@
         <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">requestIdClient</span><span>.</span><span class="identifier">run</span><span>(</span><span class="identifier">okRequest</span><span>).</span><span class="identifier">use</span><span>(</span><span class="identifier">resp</span><span> =&gt;
   (</span><span class="identifier">resp</span><span>.</span><span class="identifier">headers</span><span>, </span><span class="identifier">resp</span><span>.</span><span class="identifier">attributes</span><span>.</span><span class="identifier">lookup</span><span>(</span><span class="type-name">RequestId</span><span>.</span><span class="identifier">requestIdAttrKey</span><span>)).</span><span class="identifier">pure</span><span>[</span><span class="type-name">IO</span><span>]
 ).</span><span class="identifier">unsafeRunSync</span><span>()
-</span><span class="comment">// request received, cid=0f561ff8-de6a-406f-911d-1e30e84f9805
+</span><span class="comment">// request received, cid=4225dc8a-4ffb-4159-b313-2e06d40fb864
 // res6: (Headers, Option[String]) = (
-//   Headers(Content-Length: 0, X-Request-ID: 0f561ff8-de6a-406f-911d-1e30e84f9805),
-//   Some(value = &quot;0f561ff8-de6a-406f-911d-1e30e84f9805&quot;)
+//   Headers(Content-Length: 0, X-Request-ID: 4225dc8a-4ffb-4159-b313-2e06d40fb864),
+//   Some(value = &quot;4225dc8a-4ffb-4159-b313-2e06d40fb864&quot;)
 // )</span></code></pre>
         
         <h3 id="staticheaders" class="section"><a class="anchor-link left" href="#staticheaders"><i class="icofont-laika link">&#xef71;</i></a>StaticHeaders</h3>
@@ -582,9 +582,9 @@
 ).</span><span class="identifier">unsafeRunSync</span><span>()
 </span><span class="comment">// res22: List[Status] = List(
 //   Status(code = 200),
-//   Status(code = 503),
-//   Status(code = 503),
 //   Status(code = 200),
+//   Status(code = 503),
+//   Status(code = 503),
 //   Status(code = 503)
 // )</span></code></pre>
         
@@ -625,7 +625,7 @@
 </span><span class="keyword">val</span><span> </span><span class="identifier">timeoutClient</span><span> = </span><span class="type-name">Client</span><span>.</span><span class="identifier">fromHttpApp</span><span>(</span><span class="identifier">timeoutService</span><span>)</span></code></pre>
         <p><code>/wait</code> takes 10 ms to finish so it&#39;s cancelled:</p>
         <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">timeoutClient</span><span>.</span><span class="identifier">status</span><span>(</span><span class="identifier">waitRequest</span><span>).</span><span class="identifier">timed</span><span>.</span><span class="identifier">unsafeRunSync</span><span>()
-</span><span class="comment">// res24: (FiniteDuration, Status) = (5951732 nanoseconds, Status(code = 503))</span></code></pre>
+</span><span class="comment">// res24: (FiniteDuration, Status) = (5813903 nanoseconds, Status(code = 503))</span></code></pre>
         
         <h2 id="error-handling-and-logging" class="section"><a class="anchor-link left" href="#error-handling-and-logging"><i class="icofont-laika link">&#xef71;</i></a>Error handling and Logging</h2>
         
@@ -740,9 +740,9 @@
 </span><span class="keyword">val</span><span> </span><span class="identifier">bodyCacheClient</span><span> = </span><span class="type-name">Client</span><span>.</span><span class="identifier">fromHttpApp</span><span>(</span><span class="identifier">bodyCacheService</span><span>)</span></code></pre>
         <p><code>/doubleRead</code> reads the body twice, when using the middleware we see that both read values the same:</p>
         <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">client</span><span>.</span><span class="identifier">expect</span><span>[</span><span class="type-name">String</span><span>](</span><span class="identifier">randomRequest</span><span>).</span><span class="identifier">unsafeRunSync</span><span>()
-</span><span class="comment">// res31: String = &quot;-930107043 == -1551469733&quot;
+</span><span class="comment">// res31: String = &quot;-1285527505 == 361053986&quot;
 </span><span class="identifier">bodyCacheClient</span><span>.</span><span class="identifier">expect</span><span>[</span><span class="type-name">String</span><span>](</span><span class="identifier">randomRequest</span><span>).</span><span class="identifier">unsafeRunSync</span><span>()
-</span><span class="comment">// res32: String = &quot;804555319 == 804555319&quot;</span></code></pre>
+</span><span class="comment">// res32: String = &quot;-1034603980 == -1034603980&quot;</span></code></pre>
         
         <h3 id="bracketrequestresponse" class="section"><a class="anchor-link left" href="#bracketrequestresponse"><i class="icofont-laika link">&#xef71;</i></a>BracketRequestResponse</h3>
         <p>Brackets the handling of the request ensuring an action happens before the service handles
